@@ -136,7 +136,7 @@ public class SorterMain {
 	}
 	
 	private static boolean isWeapon(String item) {
-		return item.contains("%)");
+		return item.contains("|");
 	}
 	
 	private static boolean isSRank(String item) {
@@ -152,14 +152,14 @@ public class SorterMain {
 			if (item.contains("+")) {
 				endIndex = item.indexOf("+") - 1;
 			} else {
-				endIndex = item.indexOf("(N") - 1;
+				endIndex = item.indexOf("[") - 1;
 			}
 		return item.substring(startIndex, endIndex);
 	}
 	
 	private static int hitAmount(String item) {
-		int startIndex = item.indexOf("%/H") + 4;
-		int endIndex = item.lastIndexOf("%)");
+		int startIndex = item.indexOf("|") + 1;
+		int endIndex = item.lastIndexOf("]");
 		int hit = Integer.parseInt(item.substring(startIndex, endIndex));
 		return hit;
 	}
@@ -242,10 +242,15 @@ public class SorterMain {
 	
 	private static int otherCount(String item) {
 		int count = 1;
-		if (Character.isDigit(item.charAt(item.length()-1))) {
-			int startIndex = item.lastIndexOf("x") + 1;
-			count = Integer.parseInt(item.substring(startIndex));
+		try {
+			if (Character.isDigit(item.charAt(item.length()-1))) {
+				int startIndex = item.lastIndexOf("x") + 1;
+				count = Integer.parseInt(item.substring(startIndex));
+			}
+		} catch (NumberFormatException e) {
+			return 1;
 		}
+		
 		return count;
 	}
 	
