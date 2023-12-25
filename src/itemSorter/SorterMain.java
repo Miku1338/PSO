@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 public class SorterMain {
 	
 	public static void main(String[] args) {
-		Map<String, List> weaponsMap = new HashMap<>();
-		Map<String, List> armorMap = new HashMap<>();
-		Map<String, List> techMap = new HashMap<>();
+		Map<String, List<String>> weaponsMap = new HashMap<>();
+		Map<String, List<String>> armorMap = new HashMap<>();
+		Map<String, List<String>> techMap = new HashMap<>();
 		List<String> magList = new ArrayList<>();
 		Map<String, Integer> otherMap = new HashMap<>();
 		Scanner s = new Scanner(System.in);
@@ -28,21 +28,16 @@ public class SorterMain {
 			} else {
 				if (isWeapon(itemData)) {
 					String weaponName = weaponName(itemData);
-					int hit = hitAmount(itemData);
+					String stats = statsAmount(itemData);
 					boolean isUntekked = isUntekked(itemData);
-					String hitString;
-					if (!isUntekked) {
-						hitString = Integer.toString(hit);
-					} else if (hit > 0) {
-						hitString = hit + "U";
-					} else {
-						hitString = "0";
+					if (isUntekked) {
+						stats += " (U)";
 					}
 					if (weaponsMap.containsKey(weaponName)) {
-						weaponsMap.get(weaponName).add(hitString);
+						weaponsMap.get(weaponName).add(stats);
 					} else {
 						List<String> newList = new ArrayList<String>();
-						newList.add(hitString);
+						newList.add(stats);
 						weaponsMap.put(weaponName, newList);
 					}
 				} else if (isArmor(itemData)) {
@@ -82,12 +77,13 @@ public class SorterMain {
 			}
 		}
 		
+		s.close();
 		System.out.println("WEAPONS!");
 		List<String> weapons  = new ArrayList<>();
 		for (String weaponName : weaponsMap.keySet()) {
-			List<String> hitList = weaponsMap.get(weaponName);
-			Collections.sort(hitList);
-			weapons.add("[b]" + weaponName + "[/b] with these hit amounts: " + Arrays.toString(hitList.toArray()));
+			List<String> statsList = weaponsMap.get(weaponName);
+			Collections.sort(statsList);
+			weapons.add(weaponListToString(weaponName, statsList));
 		}
 		Collections.sort(weapons);
 		for (String weapon : weapons) {
@@ -157,11 +153,10 @@ public class SorterMain {
 		return item.substring(startIndex, endIndex);
 	}
 	
-	private static int hitAmount(String item) {
-		int startIndex = item.indexOf("|") + 1;
-		int endIndex = item.lastIndexOf("]");
-		int hit = Integer.parseInt(item.substring(startIndex, endIndex));
-		return hit;
+	private static String statsAmount(String item) {
+		int startIndex = item.indexOf("[");
+		int endIndex = item.lastIndexOf("]") + 1;
+		return item.substring(startIndex, endIndex);
 	}
 	
 	private static boolean isUntekked(String item) {
@@ -252,6 +247,16 @@ public class SorterMain {
 		}
 		
 		return count;
+	}
+	
+	private static String weaponListToString(String weaponName, List<String> weapons) {
+		StringBuilder sb = new StringBuilder(weapons.size() * 15 + weaponName.length());
+		sb.append("[b]" + weaponName + "[/b]: ");
+		for (int i = 0; i < weapons.size(); ++i) {
+			sb.append("\n" + weapons.get(i));
+		}
+		
+		return sb.toString();
 	}
 	
 }
