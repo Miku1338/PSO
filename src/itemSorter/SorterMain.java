@@ -17,6 +17,7 @@ public class SorterMain {
 		Map<String, List<String>> armorMap = new HashMap<>();
 		Map<String, List<String>> techMap = new HashMap<>();
 		List<String> magList = new ArrayList<>();
+		Map<String, Integer> matMap = new HashMap<>();
 		Map<String, Integer> otherMap = new HashMap<>();
 		Scanner s = new Scanner(System.in);
 		while (true) {
@@ -27,9 +28,9 @@ public class SorterMain {
 				continue;
 			} else {
 				if (isWeapon(itemData)) {
-					String weaponName = weaponName(itemData);
-					String stats = statsAmount(itemData);
-					boolean isUntekked = isUntekked(itemData);
+					String weaponName = SorterUtils.weaponName(itemData);
+					String stats = SorterUtils.statsAmount(itemData);
+					boolean isUntekked = SorterUtils.isUntekked(itemData);
 					if (isUntekked) {
 						stats += " (U)";
 					}
@@ -65,6 +66,14 @@ public class SorterMain {
 					}
 				} else if (isMag(itemData)) {
 					magList.add(magData(itemData));
+				} else if (isMaterial(itemData)) {
+					String itemName = otherName(itemData);
+					int count = otherCount(itemData);
+					if (matMap.containsKey(itemName)) {
+						matMap.put(itemName, matMap.get(itemName) + count);
+					} else {
+						matMap.put(itemName, count);
+					}
 				} else {
 					String itemName = otherName(itemData);
 					int count = otherCount(itemData);
@@ -82,8 +91,20 @@ public class SorterMain {
 		List<String> weapons  = new ArrayList<>();
 		for (String weaponName : weaponsMap.keySet()) {
 			List<String> statsList = weaponsMap.get(weaponName);
-			Collections.sort(statsList);
-			weapons.add(weaponListToString(weaponName, statsList));
+			List<String> statsListAppended = new ArrayList<>();
+			
+			if (args.length > 0) {
+				for (String stats : statsList) {
+					Weapon weaponObject = new Weapon(weaponName + " " + stats);
+					stats += " - " + weaponObject.calculateValue();
+					statsListAppended.add(stats);
+				}
+				
+				weapons.add(weaponListToString(weaponName, statsListAppended));
+			} else {
+				weapons.add(weaponListToString(weaponName, statsList));
+			}
+
 		}
 		Collections.sort(weapons);
 		for (String weapon : weapons) {
@@ -120,6 +141,16 @@ public class SorterMain {
 			System.out.println(mag);
 		}
 		
+		System.out.println("\nMATERIALS!");
+		List<String> mats = new ArrayList<>();
+		for (String matName : matMap.keySet()) {
+			mats.add("[b]" + matName + "[/b] x" + matMap.get(matName));
+		}
+		Collections.sort(mats);
+		for (String mat : mats) {
+			System.out.println(mat);
+		}
+		
 		System.out.println("\nOTHERS!");
 		List<String> others = new ArrayList<>();
 		for (String otherName : otherMap.keySet()) {
@@ -131,37 +162,18 @@ public class SorterMain {
 		}
 	}
 	
+	private static boolean isMaterial(String itemData) {
+		return itemData.contains("Material");
+	}
+
 	private static boolean isWeapon(String item) {
 		return item.contains("|");
 	}
 	
 	private static boolean isSRank(String item) {
-		return !item.contains("DFP") && item.contains("+") && !item.contains("%");
+		return !item.contains("DFP") && item.contains("+") && !item.contains("[");
 	}
-	
-	private static String weaponName(String item) {
-		int startIndex = item.indexOf(":") + 2;
-		if (startIndex < 0) {
-			startIndex = 0;
-		}
-		int endIndex;
-			if (item.contains("+")) {
-				endIndex = item.indexOf("+") - 1;
-			} else {
-				endIndex = item.indexOf("[") - 1;
-			}
-		return item.substring(startIndex, endIndex);
-	}
-	
-	private static String statsAmount(String item) {
-		int startIndex = item.indexOf("[");
-		int endIndex = item.lastIndexOf("]") + 1;
-		return item.substring(startIndex, endIndex);
-	}
-	
-	private static boolean isUntekked(String item) {
-		return item.contains("UNTEKKED");
-	}
+
 	
 	private static boolean isArmor(String item) {
 		return item.contains("DFP") && item.contains("EVP");
@@ -251,7 +263,7 @@ public class SorterMain {
 	
 	private static String weaponListToString(String weaponName, List<String> weapons) {
 		StringBuilder sb = new StringBuilder(weapons.size() * 15 + weaponName.length());
-		sb.append("[b]" + weaponName + "[/b]: ");
+		sb.append(weaponName);
 		for (int i = 0; i < weapons.size(); ++i) {
 			sb.append("\n" + weapons.get(i));
 		}
