@@ -116,7 +116,7 @@ public class SorterMain {
 		for (String armorName : armorMap.keySet()) {
 			List<String> defenseList = armorMap.get(armorName);
 			Collections.sort(defenseList);
-			armors.add("[b]" + armorName + "[/b] with these defense/evade amounts: " + Arrays.toString(defenseList.toArray()));
+			armors.add(armorName + " with these defense/evade amounts: " + Arrays.toString(defenseList.toArray()));
 		}
 		Collections.sort(armors);
 		for (String armor : armors) {
@@ -128,7 +128,7 @@ public class SorterMain {
 		for (String techName : techMap.keySet()) {
 			List<String> levelList = techMap.get(techName);
 			Collections.sort(levelList);
-			techs.add("[b]" + techName + "[/b]LV: " + Arrays.toString(levelList.toArray()));
+			techs.add(techName + "LV: " + Arrays.toString(levelList.toArray()));
 		}
 		Collections.sort(techs);
 		for (String tech : techs) {
@@ -144,7 +144,7 @@ public class SorterMain {
 		System.out.println("\nMATERIALS!");
 		List<String> mats = new ArrayList<>();
 		for (String matName : matMap.keySet()) {
-			mats.add("[b]" + matName + "[/b] x" + matMap.get(matName));
+			mats.add(matName + " x" + matMap.get(matName));
 		}
 		Collections.sort(mats);
 		for (String mat : mats) {
@@ -154,7 +154,7 @@ public class SorterMain {
 		System.out.println("\nOTHERS!");
 		List<String> others = new ArrayList<>();
 		for (String otherName : otherMap.keySet()) {
-			others.add("[b]" + otherName + "[/b] x" + otherMap.get(otherName));
+			others.add(otherName + " x" + otherMap.get(otherName));
 		}
 		Collections.sort(others);
 		for (String other : others) {

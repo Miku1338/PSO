@@ -56,10 +56,11 @@ public class Weapon {
 					} else {
 						value = allValues[hit / 5];
 					}
+					int bonusMultiplier = Integer.parseInt(pieces[piecesLength - 7]);
 					if (value < 25) {
-						value *= attributeBonus();
+						value *= attributeBonus(bonusMultiplier);
 					} else {
-						value += attributeBonusValuable();
+						value += attributeBonusValuable(bonusMultiplier);
 					}
 					break;
 					
@@ -68,29 +69,37 @@ public class Weapon {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+		s.close();
 		return (int) Math.round(value);
 	}
 	
-	private double attributeBonus() {
+	private double attributeBonus(int bonusMultiplier) {
 		int[] statsInt = stats.getStatsInt();
 		int nativePercent = statsInt[0];
 		int abeastPercent = statsInt[1];
 		int machinePercent = statsInt[2];
 		int darkPercent = statsInt[3];
 		int maxPercent = Math.max(Math.max(Math.max(nativePercent, abeastPercent), machinePercent), darkPercent);
-		double multiplier = 1 + 0.005*nativePercent + 0.005*abeastPercent + 0.005*machinePercent + 0.005*darkPercent;
+		double multiplier = bonusMultiplier * ( 0.05*nativePercent + 0.05*abeastPercent + 0.05*machinePercent + 0.05*darkPercent);
 		if (maxPercent > 75) {
-			multiplier += maxPercent*0.05;
+			multiplier += bonusMultiplier * maxPercent*0.05;
 		} else if (maxPercent > 50) {
-			multiplier += maxPercent*0.025;
+			multiplier += bonusMultiplier * maxPercent*0.05;
 		}
-		return multiplier;
+		return Math.max(1, multiplier / 50.0);
 	}
 	
-	private int attributeBonusValuable() {
+	private int attributeBonusValuable(int bonusMultiplier) {
 		int[] statsInt = stats.getStatsInt();
-		int value = 3*statsInt[0] + 3*statsInt[1] + 3*statsInt[2] + 3*statsInt[3];
+		int nativePercent = statsInt[0];
+		int abeastPercent = statsInt[1];
+		int machinePercent = statsInt[2];
+		int darkPercent = statsInt[3];
+		int maxPercent = Math.max(Math.max(Math.max(nativePercent, abeastPercent), machinePercent), darkPercent);
+		if (maxPercent > 55) {
+			bonusMultiplier = 100;
+		}
+		int value = (int) (bonusMultiplier * (statsInt[0] + statsInt[1] + statsInt[2] + statsInt[3]) / 30.0);
 		if (value == 0) {
 			value = 15;
 		}
